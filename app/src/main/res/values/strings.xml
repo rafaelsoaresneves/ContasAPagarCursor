@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Contas a Pagar</string>
+    <string name="adicionar_conta">Adicionar conta</string>
+    <string name="total">Total a pagar:</string>
+    <string name="editar">Editar</string>
+    <string name="excluir">Excluir</string>
+    <string name="descricao">Descrição</string>
+    <string name="vencimento">Vencimento</string>
+    <string name="valor">Valor</string>
+    <string name="adicionar">Adicionar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="salvar">Salvar</string>
+    <string name="lista_de_contas">Lista de Contas</string>
+    <string name="paga">Paga</string>
+    <string name="total_pago">Pago este mês</string>
+    <string name="total_pendente">A Pagar</string>
+    <string name="filtrar">Filtrar</string>
+</resources>
