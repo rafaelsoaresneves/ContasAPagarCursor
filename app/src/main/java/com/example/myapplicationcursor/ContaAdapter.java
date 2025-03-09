@@ -21,6 +21,7 @@ import java.util.Locale;
 import com.google.android.material.button.MaterialButton;
 import android.graphics.Color;
 import com.google.android.material.checkbox.MaterialCheckBox;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class ContaAdapter extends RecyclerView.Adapter<ContaAdapter.ContaViewHolder> {
 
@@ -81,7 +82,7 @@ public class ContaAdapter extends RecyclerView.Adapter<ContaAdapter.ContaViewHol
                 Date dataVencimento = sdf.parse(conta.getVencimento());
                 Date hoje = new Date();
                 
-                LinearLayout container = itemView.findViewById(R.id.containerConta);
+                ConstraintLayout container = itemView.findViewById(R.id.containerConta);
                 if (conta.isPaga()) {
                     // Conta paga - fundo cinza
                     container.setBackgroundColor(Color.parseColor("#F5F5F5"));
