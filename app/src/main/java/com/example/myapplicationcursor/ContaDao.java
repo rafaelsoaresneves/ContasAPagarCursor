@@ -24,4 +24,10 @@ public interface ContaDao {
 
     @Query("SELECT * FROM contas WHERE paga = 0")
     List<Conta> getContasPendentes();
+
+    @Query("SELECT * FROM contas WHERE descricao LIKE '%' || :termo || '%' ORDER BY vencimento ASC")
+    List<Conta> buscarPorDescricao(String termo);
+
+    @Query("SELECT * FROM contas WHERE descricao LIKE '%' || :termo || '%' AND paga = :paga ORDER BY vencimento ASC")
+    List<Conta> buscarPorDescricaoEStatus(String termo, boolean paga);
 } 

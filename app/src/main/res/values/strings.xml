@@ -15,4 +15,9 @@
     <string name="total_pago">Pago este mês</string>
     <string name="total_pendente">A Pagar</string>
     <string name="filtrar">Filtrar</string>
+    <string name="pesquisar">Pesquisar conta</string>
+    <string name="todas">Todas</string>
+    <string name="pendentes">Pendentes</string>
+    <string name="pagas">Pagas</string>
+    <string name="filtrar_contas">Filtrar Contas</string>
 </resources>

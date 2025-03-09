@@ -11,8 +11,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.chip.ChipGroup;
+import android.text.Editable;
+import android.text.TextWatcher;
 
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -32,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
     private TextView txtContasPendentes;
     private TextView txtContasPagas;
     private ContaDao contaDao;
+    private AlertDialog dialogFiltro;
+    private String termoBusca = "";
+    private int filtroStatus = 0; // 0 = todas, 1 = pendentes, 2 = pagas
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +74,9 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
                 }
             }
         });
+
+        MaterialButton btnFiltrar = findViewById(R.id.btnFiltrar);
+        btnFiltrar.setOnClickListener(v -> showFiltroDialog());
 
         atualizarTotais();
     }
@@ -187,5 +197,89 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
         txtTotalPago.setText(currencyFormat.format(totalPago));
         txtContasPendentes.setText(contasPendentes + (contasPendentes == 1 ? " pendente" : " pendentes"));
         txtContasPagas.setText(contasPagas + (contasPagas == 1 ? " paga" : " pagas"));
+    }
+
+    private void showFiltroDialog() {
+        if (dialogFiltro == null) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            View view = LayoutInflater.from(this).inflate(R.layout.dialog_filtro, null);
+            
+            TextInputEditText edtPesquisa = view.findViewById(R.id.edtPesquisa);
+            ChipGroup chipGroupStatus = view.findViewById(R.id.chipGroupStatus);
+            
+            // Restaurar estado anterior
+            edtPesquisa.setText(termoBusca);
+            switch (filtroStatus) {
+                case 1:
+                    chipGroupStatus.check(R.id.chipPendentes);
+                    break;
+                case 2:
+                    chipGroupStatus.check(R.id.chipPagas);
+                    break;
+                default:
+                    chipGroupStatus.check(R.id.chipTodas);
+            }
+
+            // Listener para pesquisa em tempo real
+            edtPesquisa.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    termoBusca = s.toString();
+                    aplicarFiltros();
+                }
+            });
+
+            // Listener para mudança de status
+            chipGroupStatus.setOnCheckedChangeListener((group, checkedId) -> {
+                if (checkedId == R.id.chipPendentes) {
+                    filtroStatus = 1;
+                } else if (checkedId == R.id.chipPagas) {
+                    filtroStatus = 2;
+                } else {
+                    filtroStatus = 0;
+                }
+                aplicarFiltros();
+            });
+
+            builder.setTitle(R.string.filtrar_contas)
+                   .setView(view)
+                   .setPositiveButton("Fechar", null);
+
+            dialogFiltro = builder.create();
+        }
+        dialogFiltro.show();
+    }
+
+    private void aplicarFiltros() {
+        List<Conta> contasFiltradas;
+        
+        if (termoBusca.isEmpty()) {
+            if (filtroStatus == 1) {
+                contasFiltradas = contaDao.getContasPendentes();
+            } else if (filtroStatus == 2) {
+                contasFiltradas = contaDao.buscarPorDescricaoEStatus("", true);
+            } else {
+                contasFiltradas = contaDao.getAll();
+            }
+        } else {
+            if (filtroStatus == 1) {
+                contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, false);
+            } else if (filtroStatus == 2) {
+                contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, true);
+            } else {
+                contasFiltradas = contaDao.buscarPorDescricao(termoBusca);
+            }
+        }
+
+        contas.clear();
+        contas.addAll(contasFiltradas);
+        adapter.notifyDataSetChanged();
+        atualizarTotais();
     }
 }
