@@ -279,14 +279,20 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
         
         try {
             if (termoBusca.isEmpty()) {
-                if (filtroStatus == 1) {
-                    contasFiltradas = contaDao.getContasPendentes();
-                } else if (filtroStatus == 2) {
-                    contasFiltradas = contaDao.buscarPorDescricaoEStatus("", true);
-                } else {
-                    contasFiltradas = contaDao.getAll();
+                // Se não há termo de busca, filtra apenas por status
+                switch (filtroStatus) {
+                    case 1: // Pendentes
+                        contasFiltradas = contaDao.getContasPendentes();
+                        break;
+                    case 2: // Pagas
+                        contasFiltradas = contaDao.getContasPagas();
+                        break;
+                    default: // Todas
+                        contasFiltradas = contaDao.getAll();
+                        break;
                 }
             } else {
+                // Se há termo de busca, combina com o status
                 if (filtroStatus == 1) {
                     contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, false);
                 } else if (filtroStatus == 2) {
@@ -298,19 +304,16 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
 
             contas.clear();
             contas.addAll(contasFiltradas);
-            runOnUiThread(() -> {
-                adapter.notifyDataSetChanged();
-                atualizarTotais();
-            });
+            adapter.notifyDataSetChanged();
+            atualizarTotais();
+            
         } catch (Exception e) {
             e.printStackTrace();
-            runOnUiThread(() -> {
-                new AlertDialog.Builder(this)
-                    .setTitle("Erro")
-                    .setMessage("Erro ao aplicar filtros: " + e.getMessage())
-                    .setPositiveButton("OK", null)
-                    .show();
-            });
+            new AlertDialog.Builder(this)
+                .setTitle("Erro")
+                .setMessage("Erro ao aplicar filtros: " + e.getMessage())
+                .setPositiveButton("OK", null)
+                .show();
         }
     }
 

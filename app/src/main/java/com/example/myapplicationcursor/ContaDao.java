@@ -10,8 +10,20 @@ import java.util.List;
 
 @Dao
 public interface ContaDao {
-    @Query("SELECT * FROM contas ORDER BY vencimento ASC")
+    @Query("SELECT * FROM conta ORDER BY vencimento ASC")
     List<Conta> getAll();
+
+    @Query("SELECT * FROM conta WHERE paga = 0 ORDER BY vencimento ASC")
+    List<Conta> getContasPendentes();
+
+    @Query("SELECT * FROM conta WHERE paga = 1 ORDER BY vencimento ASC")
+    List<Conta> getContasPagas();
+
+    @Query("SELECT * FROM conta WHERE descricao LIKE '%' || :termo || '%' ORDER BY vencimento ASC")
+    List<Conta> buscarPorDescricao(String termo);
+
+    @Query("SELECT * FROM conta WHERE descricao LIKE '%' || :termo || '%' AND paga = :paga ORDER BY vencimento ASC")
+    List<Conta> buscarPorDescricaoEStatus(String termo, boolean paga);
 
     @Insert
     long insert(Conta conta);
@@ -21,13 +33,4 @@ public interface ContaDao {
 
     @Delete
     void delete(Conta conta);
-
-    @Query("SELECT * FROM contas WHERE paga = 0")
-    List<Conta> getContasPendentes();
-
-    @Query("SELECT * FROM contas WHERE descricao LIKE '%' || :termo || '%' ORDER BY vencimento ASC")
-    List<Conta> buscarPorDescricao(String termo);
-
-    @Query("SELECT * FROM contas WHERE descricao LIKE '%' || :termo || '%' AND paga = :paga ORDER BY vencimento ASC")
-    List<Conta> buscarPorDescricaoEStatus(String termo, boolean paga);
 } 
