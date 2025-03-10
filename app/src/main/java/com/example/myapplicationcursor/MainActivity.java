@@ -2,6 +2,8 @@ package com.example.myapplicationcursor;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.graphics.Color;
+import android.graphics.ColorStateList;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
     private AlertDialog dialogFiltro;
     private String termoBusca = "";
     private int filtroStatus = 0; // 0 = todas, 1 = pendentes, 2 = pagas
+    private MaterialButton btnFiltrar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,8 +78,9 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
             }
         });
 
-        MaterialButton btnFiltrar = findViewById(R.id.btnFiltrar);
+        btnFiltrar = findViewById(R.id.btnFiltrar);
         btnFiltrar.setOnClickListener(v -> showFiltroDialog());
+        atualizarTextoBotaoFiltro();
 
         atualizarTotais();
     }
@@ -245,11 +249,18 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
                     filtroStatus = 0;
                 }
                 aplicarFiltros();
+                atualizarTextoBotaoFiltro();
             });
 
             builder.setTitle(R.string.filtrar_contas)
                    .setView(view)
-                   .setPositiveButton("Fechar", null);
+                   .setPositiveButton(R.string.fechar, null)
+                   .setNeutralButton(R.string.limpar_filtros, (dialog, which) -> {
+                       termoBusca = "";
+                       filtroStatus = 0;
+                       aplicarFiltros();
+                       atualizarTextoBotaoFiltro();
+                   });
 
             dialogFiltro = builder.create();
         }
@@ -281,5 +292,34 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
         contas.addAll(contasFiltradas);
         adapter.notifyDataSetChanged();
         atualizarTotais();
+    }
+
+    private void atualizarTextoBotaoFiltro() {
+        String statusText;
+        switch (filtroStatus) {
+            case 1:
+                statusText = getString(R.string.pendentes);
+                btnFiltrar.setIconTint(ColorStateList.valueOf(Color.parseColor("#D32F2F")));
+                btnFiltrar.setTextColor(Color.parseColor("#D32F2F"));
+                btnFiltrar.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#D32F2F")));
+                break;
+            case 2:
+                statusText = getString(R.string.pagas);
+                btnFiltrar.setIconTint(ColorStateList.valueOf(Color.parseColor("#1B5E20")));
+                btnFiltrar.setTextColor(Color.parseColor("#1B5E20"));
+                btnFiltrar.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#1B5E20")));
+                break;
+            default:
+                statusText = getString(R.string.filtrar);
+                btnFiltrar.setIconTint(ColorStateList.valueOf(Color.parseColor("#757575")));
+                btnFiltrar.setTextColor(Color.parseColor("#757575"));
+                btnFiltrar.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#757575")));
+        }
+
+        if (!termoBusca.isEmpty()) {
+            statusText += " (" + termoBusca + ")";
+        }
+        
+        btnFiltrar.setText(statusText);
     }
 }

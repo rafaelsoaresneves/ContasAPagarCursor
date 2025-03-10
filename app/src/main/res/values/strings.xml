@@ -20,4 +20,6 @@
     <string name="pendentes">Pendentes</string>
     <string name="pagas">Pagas</string>
     <string name="filtrar_contas">Filtrar Contas</string>
+    <string name="fechar">Fechar</string>
+    <string name="limpar_filtros">Limpar Filtros</string>
 </resources>
