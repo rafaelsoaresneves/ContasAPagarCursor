@@ -255,10 +255,16 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
 
             builder.setTitle(R.string.filtrar_contas)
                    .setView(view)
-                   .setPositiveButton(R.string.fechar, null)
+                   .setPositiveButton(R.string.fechar, (dialog, which) -> {
+                       // Atualiza novamente ao fechar para garantir que os filtros foram aplicados
+                       aplicarFiltros();
+                       atualizarTextoBotaoFiltro();
+                   })
                    .setNeutralButton(R.string.limpar_filtros, (dialog, which) -> {
                        termoBusca = "";
                        filtroStatus = 0;
+                       edtPesquisa.setText("");
+                       chipGroupStatus.check(R.id.chipTodas);
                        aplicarFiltros();
                        atualizarTextoBotaoFiltro();
                    });
@@ -271,28 +277,41 @@ public class MainActivity extends AppCompatActivity implements ContaAdapter.OnCo
     private void aplicarFiltros() {
         List<Conta> contasFiltradas;
         
-        if (termoBusca.isEmpty()) {
-            if (filtroStatus == 1) {
-                contasFiltradas = contaDao.getContasPendentes();
-            } else if (filtroStatus == 2) {
-                contasFiltradas = contaDao.buscarPorDescricaoEStatus("", true);
+        try {
+            if (termoBusca.isEmpty()) {
+                if (filtroStatus == 1) {
+                    contasFiltradas = contaDao.getContasPendentes();
+                } else if (filtroStatus == 2) {
+                    contasFiltradas = contaDao.buscarPorDescricaoEStatus("", true);
+                } else {
+                    contasFiltradas = contaDao.getAll();
+                }
             } else {
-                contasFiltradas = contaDao.getAll();
+                if (filtroStatus == 1) {
+                    contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, false);
+                } else if (filtroStatus == 2) {
+                    contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, true);
+                } else {
+                    contasFiltradas = contaDao.buscarPorDescricao(termoBusca);
+                }
             }
-        } else {
-            if (filtroStatus == 1) {
-                contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, false);
-            } else if (filtroStatus == 2) {
-                contasFiltradas = contaDao.buscarPorDescricaoEStatus(termoBusca, true);
-            } else {
-                contasFiltradas = contaDao.buscarPorDescricao(termoBusca);
-            }
-        }
 
-        contas.clear();
-        contas.addAll(contasFiltradas);
-        adapter.notifyDataSetChanged();
-        atualizarTotais();
+            contas.clear();
+            contas.addAll(contasFiltradas);
+            runOnUiThread(() -> {
+                adapter.notifyDataSetChanged();
+                atualizarTotais();
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            runOnUiThread(() -> {
+                new AlertDialog.Builder(this)
+                    .setTitle("Erro")
+                    .setMessage("Erro ao aplicar filtros: " + e.getMessage())
+                    .setPositiveButton("OK", null)
+                    .show();
+            });
+        }
     }
 
     private void atualizarTextoBotaoFiltro() {
