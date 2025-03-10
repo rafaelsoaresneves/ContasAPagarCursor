@@ -2,32 +2,33 @@ package com.example.myapplicationcursor;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.ColorStateList;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.chip.ChipGroup;
-import android.text.Editable;
-import android.text.TextWatcher;
 
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import androidx.annotation.NonNull;
 
 public class MainActivity extends AppCompatActivity implements ContaAdapter.OnContaChangeListener {
 
